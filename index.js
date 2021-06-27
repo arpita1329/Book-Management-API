@@ -165,6 +165,149 @@ ShapeAI.get("/publications/p/:isbn", (req,res) => {
     return res.json({publications:getPublications});
 });
 
+/*
+    Route : /book/new
+    Description : Add new book
+    Access : PUBLIC
+    Parameters : NONE
+    Method : POST
+*/
+ShapeAI.post("/book/new",(req,res) => {
+    const {newBook} = req.body;
+    database.books.push(newBook);
+    return res.json({books : database.books , message : "Book was added!!"});
+});
+
+/*
+    Route : /author/new
+    Description : Add new author
+    Access : PUBLIC
+    Parameters : NONE
+    Method : POST
+*/
+ShapeAI.post("/author/new",(req,res) => {
+    const {newAuthor} = req.body;
+    database.authors.push(newAuthor);
+    return res.json({authors : database.authors , message : "Author was added!!"});
+});
+
+/*
+    Route : /publication/new
+    Description : Add new publication
+    Access : PUBLIC
+    Parameters : NONE
+    Method : POST
+*/
+ShapeAI.post("/publication/new",(req,res) => {
+    const {newPublication} = req.body;
+    database.publications.push(newPublication);
+    return res.json({publications : database.publications , message : "Publication was added!!"});
+});
+
+/*
+    Route : /book/update
+    Description : Update the title of book
+    Access : PUBLIC
+    Parameters : ISBN
+    Method : PUT
+*/
+ShapeAI.put("/book/update/:isbn",(req,res) => {
+    // here we are using forEach as it directly modify the object instead of map as it create new array and replaces it with old one
+    database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn) {
+            book.title = req.body.bookTitle;
+            return;
+        }
+    });
+    return res.json({books : database.books});
+});
+
+/*
+    Route : /book/author/update
+    Description : Update/add new author
+    Access : PUBLIC
+    Parameters : ISBN
+    Method : PUT
+*/
+ShapeAI.put("/book/author/update/:isbn", (req,res) => {
+    // Update the book database
+    database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn) 
+            return book.authors.push(req.body.newAuthor);
+    });
+
+    // Update the author database
+    database.authors.forEach((author) => {
+        if(author.id == req.body.newAuthor)
+            return database.author.books.push(req.params.isbn);
+    });
+
+    return res.json({books : database.books, authors : database.authors, message : "New Author is added"});
+});
+
+/*
+    Route : /author/update
+    Description : Update the name of author
+    Access : PUBLIC
+    Parameters : ID
+    Method : PUT
+*/
+ShapeAI.put("/author/update/:id",(req,res) => {
+    // here we are using forEach as it directly modify the object instead of map as it create new array and replaces it with old one
+    database.authors.forEach((author) => {
+        if(author.id == req.params.id) {
+            author.name = req.body.authorName;
+            return;
+        }
+    });
+    return res.json({authors : database.authors});
+});
+
+/*
+    Route : /publication/update
+    Description : Update the name of author
+    Access : PUBLIC
+    Parameters : ID
+    Method : PUT
+*/
+ShapeAI.put("/publication/update/:id",(req,res) => {
+    // here we are using forEach as it directly modify the object instead of map as it create new array and replaces it with old one
+    database.publications.forEach((publication) => {
+        if(publication.id == req.params.id) {
+            publication.name = req.body.publicationName;
+            return;
+        }
+    });
+    return res.json({publications : database.publications});
+});
+
+/*
+    Route : /publication/book/update
+    Description : Update/add new book to an publication
+    Access : PUBLIC
+    Parameters : ISBN
+    Method : PUT
+*/
+ShapeAI.put("/publication/book/update/:isbn", (req,res) => {
+    // Update the book database
+    database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn) 
+            return book.publications.push(req.body.newPublication);
+    });
+
+    // Update the publication database
+    database.publications.forEach((publication) => {
+        if(publication.id == req.body.newPublication)
+            return database.publication.books.push(req.params.isbn);
+    });
+    return res.json({publications : database.publications, books : database.books, message : "New publication is added"});
+});
+
+
+
+
+
+
 
 // Run the Server
 ShapeAI.listen(3000);
