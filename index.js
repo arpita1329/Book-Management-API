@@ -282,30 +282,125 @@ ShapeAI.put("/publication/update/:id",(req,res) => {
 });
 
 /*
-    Route : /publication/book/update
+    Route : /publication/book/update    (NOT WORKING)
     Description : Update/add new book to an publication
     Access : PUBLIC
     Parameters : ISBN
     Method : PUT
 */
 ShapeAI.put("/publication/book/update/:isbn", (req,res) => {
-    // Update the book database
-    database.books.forEach((book) => {
-        if(book.ISBN === req.params.isbn) 
-            return book.publications.push(req.body.newPublication);
-    });
 
     // Update the publication database
     database.publications.forEach((publication) => {
         if(publication.id == req.body.newPublication)
-            return database.publication.books.push(req.params.isbn);
+            return publication.books.push(req.params.isbn);
+    });
+
+     // Update the book database
+     database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn) 
+           book.publications=req.body.newPublication;
+           return ;
     });
     return res.json({publications : database.publications, books : database.books, message : "New publication is added"});
 });
 
+/*
+    Route : /book/delete
+    Description : delete a book
+    Access : PUBLIC
+    Parameters : ISBN
+    Method : DELETE
+*/
+ShapeAI.delete("/book/delete/:isbn", (req,res) => {
+    const updatedBookDatabase = database.books.filter((book) => book.ISBN !== req.params.isbn);
+    database.books = updatedBookDatabase;
+    return res.json({books : database.books});
+});
+
+/*
+    Route : /book/author/delete
+    Description : delete author from book
+    Access : PUBLIC
+    Parameters : ISBN, author id
+    Method : DELETE
+*/
+ShapeAI.delete("/book/author/delete/:isbn/:authorId", (req,res) => {
+    // update the book database
+    database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn) {
+            const newAuthorList = book.authors.filter((author) => author !== parseInt(req.params.authorId));
+            book.authors = newAuthorList;
+            return;
+        }
+    });
+
+    // update the author database
+    database.authors.forEach((author) => {
+        if(author.id === parseInt(req.params.authorId)) {
+            const newBookList = author.books.filter((book) => book !== req.params.isbn);
+            author.books = newBookList;
+            return;
+        }
+    });
+
+    return res.json({books:database.books, authors:database.authors, message:"Successfully Deleted"});
+});
+
+/*
+    Route : /author/delete
+    Description : delete a author
+    Access : PUBLIC
+    Parameters : id
+    Method : DELETE
+*/
+ShapeAI.delete("/author/delete/:id", (req,res) => {
+    const updatedAuthorDatabase = database.authors.filter((author) => author.id !== parseInt(req.params.id));
+    database.authors = updatedAuthorDatabase;
+    return res.json({authors : database.authors});
+});
+
+/*
+    Route : /publication/delete
+    Description : delete a publication
+    Access : PUBLIC
+    Parameters : id
+    Method : DELETE
+*/
+ShapeAI.delete("/publication/delete/:id", (req,res) => {
+    const updatedPublicationDatabase = database.publications.filter((publication) => publication.id !== parseInt(req.params.id));
+    database.publications = updatedPublicationDatabase;
+    return res.json({publications : database.publications});
+});
+
+/*
+    Route : /publication/delete/book
+    Description : delete a book from publication
+    Access : PUBLIC
+    Parameters : ISBN, publication id
+    Method : DELETE
+*/
+ShapeAI.delete("/publication/delete/book/:isbn/:pubId", (req,res) => {
+     // update the publication database
+     database.publications.forEach((publication) => {
+        if(publication.id === parseInt(req.params.pubId)) {
+            const newPublicationList = publication.books.filter((book) => book !== req.params.isbn);
+            publication.books = newPublicationList;
+            return;
+        }
+    });
+    
+    // update the book database
+    database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn) {
+            book.publication = 0;       // no publication is available
+            return;
+        }
+    });
 
 
-
+    return res.json({books:database.books, publications:database.publications, message:"Successfully Deleted"});
+});
 
 
 

@@ -1,5 +1,5 @@
 // Data for Books
-const books = [
+let books = [
     {
         ISBN : "12345ONE",
         title : "Getting Started with MERN",
@@ -23,7 +23,7 @@ const books = [
 ];
 
 // Data for Authors
-const authors = [
+let authors = [
     {
         id : 1,
         name : "Arpita",
@@ -37,7 +37,7 @@ const authors = [
 ];
 
 // Data for Publications
-const publications = [
+let publications = [
     {
         id : 1,
         name : "Chakra",
